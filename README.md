@@ -19,7 +19,7 @@ Para compilar o projeto, utilize o Makefile incluso:
 make
 
 # Para executar
-./nome_do_seu_executavel
+./logistics
 ```
 ## 🏗 Arquitetura
 - src/: Código-fonte (.c).
