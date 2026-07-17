@@ -1,7 +1,9 @@
 #include<stdio.h>
 #include<stdlib.h>
+
 #include "graph.h"
 #include "priority_queue.h"
+#include "dijkstra.h"
 
 int main(){
 
@@ -35,12 +37,13 @@ int main(){
   int continua = 0; 
   int origin, destination, weight;
 
-  while (continua != 3) {
+  while (continua != 4) {
   
     printf("\n--- LOGISTICS NETWORK MENU ---\n");
     printf("1. Add Edge\n");
     printf("2. Print Graph\n");
-    printf("3. Exit\n");
+    printf("3. Calculate Route\n");
+    printf("4. Exit\n");
     printf("Choose an option: ");
     scanf("%d", &continua);
 
@@ -63,6 +66,16 @@ int main(){
             break;
 
         case 3:
+            printf("Wich is the start vertex? ");
+            scanf("%d", &origin);
+
+            printf("Wich is the end vertex? ");
+            scanf("%d", &destination);
+
+            shortest_path(map, origin, destination);
+            break;
+          
+        case 4:
             printf("Exiting engine...\n");
             break;
             
@@ -72,22 +85,6 @@ int main(){
     }
 
   }
-
-  /*MinHeap* heap = create_min_heap(10);
-
-  insert_min_heap(heap, 3, 80);
-  insert_min_heap(heap, 1, 10);
-  insert_min_heap(heap, 2, 50);
-  insert_min_heap(heap, 4, 5);
-  insert_min_heap(heap, 5, 100);
-
-  while(heap->size > 0){
-    HeapNode closest = extract_min(heap);
-    printf("Closest city -> ID: %d | Accumulate Cost: %d\n", closest.vertex_id, closest.cost);
-  }
-
-  free(heap->array);
-  free(heap);*/
     
   return 0;
 }
