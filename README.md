@@ -5,7 +5,7 @@ Sistema de otimização logística desenvolvido em C para cálculo de rotas util
 ## 🚀 Funcionalidades
 - [x] Implementação de Grafo (Lista de Adjacências).
 - [x] Fila de Prioridade (Min-Heap) com complexidade O(log n).
-- [ ] Algoritmo de Dijkstra para menor caminho.
+- [x] Algoritmo de Dijkstra para menor caminho.
 
 ## 🛠 Pré-requisitos
 - Compilador GCC.
