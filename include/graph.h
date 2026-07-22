@@ -24,5 +24,6 @@ Graph* create_graph(int num_vertex);
 Graph* create_vertex(Graph* map, int id, int x_position, int y_position, char name[]);
 Graph* add_edge(Graph* map, int weight, int origin, int destination);
 void print_graph(Graph* map);
+void free_graph(Graph* map);
 
 #endif 

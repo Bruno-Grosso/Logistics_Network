@@ -4,6 +4,7 @@
 #include "graph.h"
 #include "priority_queue.h"
 #include "dijkstra.h"
+#include "hash_table.h"
 
 int main(){
 
@@ -13,6 +14,9 @@ int main(){
   scanf("%d", &num_vertex);
 
   Graph* map = create_graph(num_vertex);
+
+  int table_size = 4099;
+  HashTable* hash = create_hash(table_size);
 
   int x, y;
   char name[50];
@@ -30,12 +34,14 @@ int main(){
     scanf("%d", &y);
     
     map = create_vertex(map, i, x, y, name);
+    hash = insert_hash(hash, name, i);
 
     printf("\n");
   }
 
-  int continua = 0; 
-  int origin, destination, weight;
+  int continua = 0;
+  int origin_id, destination_id, weight;
+  char origin[50], destination[50];
 
   while (continua != 4) {
   
@@ -49,16 +55,25 @@ int main(){
 
     switch (continua) {
         case 1:
-            printf("Which is the origin vertex? ");
-            scanf("%d", &origin);
+            printf("Which is the origin city? ");
+            scanf(" %[^\n]", origin);
 
-            printf("Which is the destination vertex? ");
-            scanf("%d", &destination);
+            printf("Which is the destination city? ");
+            scanf(" %[^\n]", destination);
 
-            printf("Which is the weight for this edge? ");
-            scanf("%d", &weight);
+            origin_id = search_hash(hash, origin);
+            destination_id = search_hash(hash, destination);
+
+            if(origin_id == -1 || destination_id == -1){
+              printf("Operation failed: One of the cities is not registered.\n");
+            } else{
+
+              printf("Which is the weight for this edge? ");
+              scanf("%d", &weight);
+
+              map = add_edge(map, weight, origin_id, destination_id);
+            }
             
-            map = add_edge(map, weight, origin, destination);
             break;
 
         case 2:
@@ -66,13 +81,21 @@ int main(){
             break;
 
         case 3:
-            printf("Wich is the start vertex? ");
-            scanf("%d", &origin);
+            printf("Wich is the start city? ");
+            scanf(" %[^\n]", origin);
 
-            printf("Wich is the end vertex? ");
-            scanf("%d", &destination);
+            printf("Wich is the final city? ");
+            scanf(" %[^\n]", destination);
 
-            shortest_path(map, origin, destination);
+            origin_id = search_hash(hash, origin);
+            destination_id = search_hash(hash, destination);
+
+            if(origin_id == -1 || destination_id == -1){
+              printf("Operation failed: One of the cities is not registered.\n");
+            } else{
+              shortest_path(map, origin_id, destination_id);
+            }
+
             break;
           
         case 4:
@@ -85,6 +108,8 @@ int main(){
     }
 
   }
-    
+  
+  free_graph(map);
+  free_hash(hash);
   return 0;
 }

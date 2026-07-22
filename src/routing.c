@@ -64,8 +64,11 @@ void shortest_path(Graph* map, int start_vertex, int end_vertex){
   free(heap->array);
   free(heap);
 
+  Vertex* local_start = map->vertex[start_vertex];
+  Vertex* local_end = map->vertex[end_vertex];
+
   if(distance[end_vertex] == INF){
-    printf("Erro: Nenhuma rota logistica possivel entre o Polo %d e o Polo %d.\n", start_vertex, end_vertex);
+    printf("Erro: Nenhuma rota logistica possivel entre %s e %s.\n", local_start->name, local_end->name);
     return; 
   }
  
@@ -82,7 +85,9 @@ void shortest_path(Graph* map, int start_vertex, int end_vertex){
   printf("\n--- RELATORIO DE ROTA ---\n");
   printf("Menor Caminho: ");
   for(int i = step_count - 1; i >= 0; i--){
-    printf("%d", path[i]);
+    Vertex* local_current = map->vertex[path[i]];
+
+    printf("%s", local_current->name);
         
     if(i > 0){
       printf(" -> ");

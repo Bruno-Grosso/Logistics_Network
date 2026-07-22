@@ -61,22 +61,57 @@ void print_graph(Graph* map){
 
     printf("\n--- LOGISTICS NETWORK MAP ---\n");
     for (int i = 0; i < map->num_vertex; i++) {
-        Vertex* v = map->vertex[i];
+      Vertex* v = map->vertex[i];
         
-        if (v != NULL) {
-            printf("[%d] %s (x: %d, y: %d) -> Connections:\n", v->vertex_id, v->name, v->x_position, v->y_position);
+      if (v != NULL) {
+        printf("[%d] %s (x: %d, y: %d) -> Connections:\n", v->vertex_id, v->name, v->x_position, v->y_position);
             
-            Edge* current_edge = v->edges;
-            if (current_edge == NULL) {
-                printf("    (No outgoing routes)\n");
-            }
-            
-            // Percorre a lista encadeada de arestas
-            while (current_edge != NULL) {
-                printf("    -> To Hub [%d] (Weight: %d)\n", current_edge->next_vertex_id, current_edge->weight);
-                current_edge = current_edge->next;
-            }
+        Edge* current_edge = v->edges;
+        if (current_edge == NULL) {
+          printf("    (No outgoing routes)\n");
         }
+
+        while (current_edge != NULL) {
+
+          int target_id = current_edge->next_vertex_id;
+          char* target_name = map->vertex[target_id]->name;
+
+
+          printf("    -> To Hub [%d] %s (Weight: %d)\n", target_id, target_name, current_edge->weight);
+          current_edge = current_edge->next;
+        }
+      }
     }
     printf("-----------------------------\n");
+}
+
+void free_graph(Graph* map) {
+
+  if (map == NULL) return;
+    
+  for (int i = 0; i < map->num_vertex; i++) {
+    Vertex* v = map->vertex[i];
+        
+    if (v != NULL) {
+            
+      Edge* current_edge = v->edges;
+      while (current_edge != NULL) {
+        Edge* next_edge = current_edge->next;
+        free(current_edge);
+        current_edge = next_edge;
+      }
+          
+      if (v->name != NULL) {
+        free(v->name);
+      }
+            
+      free(v);
+    }
+  }
+
+  if (map->vertex != NULL) {
+    free(map->vertex);
+  }
+
+  free(map);
 }
