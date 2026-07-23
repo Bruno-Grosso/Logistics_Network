@@ -1,6 +1,8 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include "merge_sort.h"
+
 typedef struct Edge{
   int next_vertex_id;
   int weight;
@@ -23,6 +25,7 @@ typedef struct Graph{
 Graph* create_graph(int num_vertex);
 Graph* create_vertex(Graph* map, int id, int x_position, int y_position, char name[]);
 Graph* add_edge(Graph* map, int weight, int origin, int destination);
+TrafficNode* generate_traffic_array(Graph* map);
 void print_graph(Graph* map);
 void free_graph(Graph* map);
 

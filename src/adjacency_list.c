@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "graph.h"
+#include "merge_sort.h"
 
 Graph* create_graph(int num_vertex){
   
@@ -54,6 +56,33 @@ Graph* add_edge(Graph* map, int weight, int origin, int destination){
   current_vertex->edges = new_edge;
 
   return map;
+}
+
+TrafficNode* generate_traffic_array(Graph* map){
+  if(map == NULL) return NULL;
+
+  int size = map->num_vertex;
+  
+  TrafficNode* traffic_array = (TrafficNode*)malloc(size*sizeof(TrafficNode));
+  
+  for(int i=0; i<size; i++){
+    traffic_array[i].vertex_id = map->vertex[i]->vertex_id;
+    traffic_array[i].name = map->vertex[i]->name;
+    traffic_array[i].incoming_routes = 0;
+  }
+
+  for(int i=0; i<size; i++){
+    Edge* current_edge = map->vertex[i]->edges;
+
+    while(current_edge != NULL){
+      int destination_id = current_edge->next_vertex_id;
+
+      traffic_array[destination_id].incoming_routes++;
+      current_edge = current_edge->next;
+    }
+  }
+
+  return traffic_array;
 }
 
 void print_graph(Graph* map){
