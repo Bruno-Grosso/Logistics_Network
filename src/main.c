@@ -1,15 +1,27 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 
 #include "graph.h"
 #include "priority_queue.h"
 #include "dijkstra.h"
 #include "hash_table.h"
 #include "merge_sort.h"
+#include "rselect.h"
+#include "parser.h"
 
 int main(){
 
+  srand(time(NULL));
+
+  int init_choice;
   int num_vertex;
+
+  printf("--- LOGISTICS SYSTEM INITIALIZATION ---\n");
+  printf("1. Load map from 'map.txt'\n");
+  printf("2. Enter cities manually\n");
+  printf("\nChoose an option: ");
+  scanf("%d", &init_choice);
   
   printf("How many vertex you need? ");
   scanf("%d", &num_vertex);
@@ -19,39 +31,45 @@ int main(){
   int table_size = 4099;
   HashTable* hash = create_hash(table_size);
 
-  int x, y;
-  char name[50];
+  if(init_choice == 1){
+    load_map(map, hash, "build/map.txt");
+  } else{
+    int x, y;
+    char name[50];
 
   
-  for(int i=0; i<num_vertex; i++){
+    for(int i=0; i<num_vertex; i++){
 
-    printf("Put the name of the city here: ");
-    scanf(" %[^\n]", name);
+      printf("Put the name of the city here: ");
+      scanf(" %[^\n]", name);
 
-    printf("Which is the position of coordinate x? ");
-    scanf("%d", &x);
+      printf("Which is the position of coordinate x? ");
+      scanf("%d", &x);
 
-    printf("Which is the position of coordinate y? ");
-    scanf("%d", &y);
+      printf("Which is the position of coordinate y? ");
+      scanf("%d", &y);
     
-    map = create_vertex(map, i, x, y, name);
-    hash = insert_hash(hash, name, i);
+      map = create_vertex(map, i, x, y, name);
+      hash = insert_hash(hash, name, i);
 
-    printf("\n");
+      printf("\n");
+    }
   }
 
+  
   int continua = 0;
   int origin_id, destination_id, weight;
   char origin[50], destination[50];
 
-  while (continua != 5) {
+  while (continua != 6) {
   
     printf("\n--- LOGISTICS NETWORK MENU ---\n");
     printf("1. Add Edge\n");
     printf("2. Print Graph\n");
     printf("3. Calculate Route\n");
     printf("4. Raking of most importants cities\n");
-    printf("5. Exit\n");
+    printf("5. Logistic audit\n");
+    printf("6. Exit\n");
     printf("\nChoose an option: ");
     scanf("%d", &continua);
 
@@ -127,8 +145,23 @@ int main(){
         free(ranking);
         printf("------------------------------------\n");
         break;
-          
+
       case 5:
+        if(map == NULL || map->num_vertex == 0){
+          printf("Error: The graph is empty or not initialized.\n");
+          break;
+        }
+
+        TrafficNode* audit_array = generate_traffic_array(map);
+        if (audit_array != NULL) {
+          run_logistics_audit(audit_array, map->num_vertex);
+          free(audit_array);
+        }else{
+          printf("Error: Could not allocate memory for audit.\n");
+        }
+        break;
+          
+      case 6:
         printf("Exiting engine...\n");
         break;
             
