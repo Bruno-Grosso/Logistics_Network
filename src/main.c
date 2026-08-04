@@ -32,7 +32,7 @@ int main(){
   HashTable* hash = create_hash(table_size);
 
   if(init_choice == 1){
-    load_map(map, hash, "build/map.txt");
+    load_map(map, hash, "data/map.txt");
   } else{
     int x, y;
     char name[50];
