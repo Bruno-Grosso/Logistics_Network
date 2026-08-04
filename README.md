@@ -26,7 +26,7 @@ O repositório segue um padrão rigoroso de separação de responsabilidades (Se
 
 1. **Clone o repositório e compile o projeto:**
 ```bash
-git clone <url-do-seu-repositorio>
+git clone https://github.com/Bruno-Grosso/Logistics_Network.git
 cd Logistics_Network
 make
 ```
