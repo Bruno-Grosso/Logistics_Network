@@ -1,50 +1,50 @@
 # 🚚 Logistics Network Engine
 
-Motor de otimização logística de alta performance desenvolvido inteiramente em **C**. O sistema não utiliza bibliotecas de alto nível de terceiros; todas as estruturas de dados fundamentais (Grafos, Tabelas Hash, Min-Heaps) e pipelines de ingestão de arquivos foram construídos do zero, garantindo controle absoluto sobre a manipulação de memória e a complexidade algorítmica.
+High-performance logistics optimization engine developed entirely in **C**. The system does not use third-party high-level libraries; all fundamental data structures (graphs, hash tables, min-heaps) and file ingestion pipelines were built from scratch, ensuring absolute control over memory management and algorithmic complexity.
 
-## 🚀 Funcionalidades e Algoritmos
+## 🚀 Features and Algorithms
 
-- [x] **Grafo Direcionado:** Implementação baseada em listas de adjacências para otimização de memória.
-- [x] **Tabela Hash:** Resolução de strings (nomes das cidades) para IDs internos em tempo constante **O(1)**, eliminando gargalos de busca.
-- [x] **Min-Heap Customizada:** Fila de prioridade com alocação dinâmica e operações de `heapify_up` / `heapify_down` em **O(log N)**.
-- [x] **Algoritmo de Dijkstra:** Motor de roteamento para cálculo do caminho de menor custo logístico.
-- [x] **Algoritmo Randomized Select (RSelect):** Módulo de auditoria que calcula a mediana de tráfego de toda a malha em tempo linear **O(N)**.
-- [x] **File Parser (Data Ingestion):** Interpretador de arquivos customizado para carregamento automatizado de malhas logísticas via `.txt`.
+- [x] **Directed Graph:** Implementation based on adjacency lists for memory optimization.
+- [x] **Hash Table:** Resolution of strings (city names) to internal IDs in constant time **O(1)**, eliminating search bottlenecks.
+- [x] **Custom Min-Heap:** Priority queue with dynamic allocation and `heapify_up` / `heapify_down` operations in **O(log N)**.
+- [x] **Dijkstra’s Algorithm:** Routing engine for calculating the path with the lowest logistics cost.
+- [x] **Randomized Select (RSelect) Algorithm:** An auditing module that calculates the median traffic across the entire network in linear time **O(N)**.
+- [x] **File Parser (Data Ingestion):** A custom file parser for automated loading of logistics networks via `.txt`.
+      
+## 🏗 Project Architecture
 
-## 🏗 Arquitetura do Projeto
+The repository follows a strict Separation of Concerns pattern:
 
-O repositório segue um padrão rigoroso de separação de responsabilidades (Separation of Concerns):
+* `src/`: Source code for structures and algorithms (`.c`).
+* `include/`: Headers and interface definitions (`.h`).
+* `data/`: *Assets* directory, containing logistics networks in `.txt` format.
+* `build/`: Directory generated during compilation (ignored by Git) that stores the binaries and the final executable.
 
-* `src/`: Código-fonte das estruturas e algoritmos (`.c`).
-* `include/`: Cabeçalhos e definições de interface (`.h`).
-* `data/`: Diretório de *assets*, contendo as malhas logísticas em formato `.txt`.
-* `build/`: Diretório gerado na compilação (ignorado via Git) que armazena os binários e o executável final.
+## ⚙️ How to Compile and Run
 
-## ⚙️ Como Compilar e Executar
+**Prerequisites:** GCC compiler and `make` installed.
 
-**Pré-requisitos:** Compilador GCC e `make` instalados.
-
-1. **Clone o repositório e compile o projeto:**
+1. **Clone the repository and compile the project:**
 ```bash
 git clone https://github.com/Bruno-Grosso/Logistics_Network.git
 cd Logistics_Network
 make
 ```
 
-2. **Execute o sistema:**
+2. **Run the system:**
 ```bash
 ./build/logistics
 ```
 
-## 🗺️ Como utilizar o carregamento via Arquivo (.txt)
+## 🗺️ How to Use File-Based Loading (.txt)
 
-O sistema permite a inserção manual de cidades, mas possui um motor otimizado para carregar malhas massivas de forma instantânea.
+The system allows for manual entry of cities, but it features an engine optimized to load massive grids instantly.
 
-Para utilizar essa função, certifique-se de que o arquivo de configuração (map.txt) esteja localizado dentro da pasta data/.
+To use this feature, make sure the configuration file (map.txt) is located inside the data/ folder.
 
-**Formato exigido no .txt:**
-O arquivo funciona como um .csv customizado. A primeira seção cadastra as cidades, e, após o separador ---, as rotas são definidas no formato Origem, Destino, Custo.
+**Required .txt format:**
+The file functions as a custom .csv. The first section lists the cities, and after the separator ---, the routes are defined in the format Origin, Destination, Cost.
 
-## 📈 Status do Projeto
+## 📈 Project Status
 
-**Em fase de testes e manutenção.** Todos os pipelines de dados, roteamento (Dijkstra) e análise estatística (RSelect) já estão integrados. Atualmente, o motor backend passa por testes de estresse de tráfego, refinamento de arquitetura e auditoria de código para garantir estabilidade e escalabilidade contínuas.
+**Currently in the testing and maintenance phase.** All data pipelines, routing (Dijkstra), and statistical analysis (RSelect) are already integrated. The backend engine is currently undergoing traffic stress testing, architectural refinement, and code audits to ensure ongoing stability and scalability.
