@@ -1,0 +1,33 @@
+# Example to use
+
+# Cities in the logistics network
+Nova Friburgo
+Rio de Janeiro
+Niteroi
+Petropolis
+Macae
+Cabo Frio
+Teresopolis
+Campos dos Goytacazes
+Volta Redonda
+Duque de Caxias
+---
+# CONNECTIONS AND TRAFFIC VOLUMES (Origin, Destination, Traffic)
+Nova Friburgo, Rio de Janeiro, 140
+Nova Friburgo, Niteroi, 90
+Nova Friburgo, Teresopolis, 60
+Nova Friburgo, Macae, 130
+Petropolis, Rio de Janeiro, 70
+Petropolis, Teresopolis, 50
+Teresopolis, Duque de Caxias, 80
+Teresopolis, Nova Friburgo, 65
+Macae, Campos dos Goytacazes, 110
+Cabo Frio, Niteroi, 130
+Cabo Frio, Macae, 95
+Rio de Janeiro, Duque de Caxias, 30
+Rio de Janeiro, Volta Redonda, 120
+Niteroi, Rio de Janeiro, 15
+Niteroi, Cabo Frio, 125
+Campos dos Goytacazes, Macae, 105
+Duque de Caxias, Volta Redonda, 100
+Duque de Caxias, Petropolis, 60

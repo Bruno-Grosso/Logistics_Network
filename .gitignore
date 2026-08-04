@@ -7,3 +7,4 @@
 
 #ignore text used to automatically create a graph
 *.txt
+!data/*.txt
