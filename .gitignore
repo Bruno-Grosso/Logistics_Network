@@ -6,5 +6,6 @@
 *.exe
 
 #ignore text used to automatically create a graph
+*.json
 *.txt
 !data/*.txt

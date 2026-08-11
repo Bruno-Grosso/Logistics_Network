@@ -68,7 +68,7 @@ void shortest_path(Graph* map, int start_vertex, int end_vertex){
   Vertex* local_end = map->vertex[end_vertex];
 
   if(distance[end_vertex] == INF){
-    printf("Erro: Nenhuma rota logistica possivel entre %s e %s.\n", local_start->name, local_end->name);
+    printf("Error: No possible logistics route between %s and %s.\n", local_start->name, local_end->name);
     return; 
   }
  
@@ -82,8 +82,8 @@ void shortest_path(Graph* map, int start_vertex, int end_vertex){
     curr = father[curr];
   }
 
-  printf("\n--- RELATORIO DE ROTA ---\n");
-  printf("Menor Caminho: ");
+  printf("\n--- Rota Report ---\n");
+  printf("Shortest path: ");
   for(int i = step_count - 1; i >= 0; i--){
     Vertex* local_current = map->vertex[path[i]];
 
@@ -94,6 +94,22 @@ void shortest_path(Graph* map, int start_vertex, int end_vertex){
     }
   }
 
-  printf("\nCusto Total Acumulado: %d\n", distance[end_vertex]);
+  printf("\nTotal accumulated cost: %d\n", distance[end_vertex]);
   printf("-------------------------\n");
+
+  FILE *file = fopen("data/path_result.json", "w");
+  if(file == NULL) {
+      printf("Warning: Could not export JSON. Check the data folder./.\n");
+  } else {
+      fprintf(file, "{\n  \"path\": [");
+      for(int i = step_count - 1; i >= 0; i--){
+          Vertex* local_current = map->vertex[path[i]];
+          fprintf(file, "\"%s\"", local_current->name);
+          if(i > 0){
+              fprintf(file, ", ");
+          }
+      }
+      fprintf(file, "]\n}\n");
+      fclose(file);
+  }
 }

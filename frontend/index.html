@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logistics Network - Radar</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
+        .panel { background-color: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .info { display: flex; flex-direction: column; }
+        h1 { margin: 0; color: #00ff88; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        p { margin: 5px 0 0 0; color: #888; font-size: 14px; }
+        .controls { display: flex; gap: 10px; }
+        button { background-color: #2a2a2a; padding: 10px 20px; border-radius: 4px; border: 1px solid #444; color: #00ff88; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
+        button:hover { filter: brightness(1.2); }
+        #btnRoute { color: #ff0055; border-color: #ff0055; }
+        #btnRoute:hover { background-color: #ff0055; color: #fff; }
+        kbd { background-color: #333; border: 1px solid #555; padding: 2px 6px; border-radius: 4px; color: #00ff88; font-family: monospace; font-weight: bold; }
+        #network-canvas { width: 100%; height: 75vh; background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <div class="info">
+            <h1>Logistics Radar</h1>
+            <p>Live Traffic Network. Hold <kbd>Q</kbd> or <kbd>E</kbd> to rotate manually. Drag cities to update orbit.</p>
+        </div>
+        <div class="controls">
+            <button id="btnRoute">Show Dijkstra Route</button>
+            <button id="toggleRotationBtn">Auto Rotation</button>
+        </div>
+    </div>
+
+    <div id="network-canvas"></div>
+
+    <script>
+        let network = null; 
+        let nodesData = new vis.DataSet();
+        let edgesData = new vis.DataSet();
+        
+        let isRotating = false;
+        let rotationSpeed = 0.002; 
+        let manualRotationSpeed = 0.015; 
+        let animationId = null;
+        let polarCoords = {}; 
+        let cityMap = {}; // Global dictionary to map City Names -> IDs
+        let globalAngleOffset = 0; // The master rotation angle
+
+        let keysPressed = { q: false, e: false };
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            if (key === 'q') keysPressed.q = true;
+            if (key === 'e') keysPressed.e = true;
+        });
+
+        document.addEventListener('keyup', (event) => {
+            const key = event.key.toLowerCase();
+            if (key === 'q') keysPressed.q = false;
+            if (key === 'e') keysPressed.e = false;
+        });
+
+        window.onload = function() {
+            fetch('../data/map.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error("Could not load map.txt");
+                    return response.text();
+                })
+                .then(text => drawNetwork(text))
+                .catch(err => {
+                    console.error(err);
+                    alert("Error: Run a local server to fetch files automatically.");
+                });
+        };
+
+        document.getElementById('toggleRotationBtn').addEventListener('click', function() {
+            isRotating = !isRotating;
+            this.innerText = isRotating ? "Stop Auto" : "Auto Rotation";
+            this.style.backgroundColor = isRotating ? "#00ff88" : "#2a2a2a";
+            this.style.color = isRotating ? "#121212" : "#00ff88";
+        });
+
+        // ==========================================
+        // DIJKSTRA ROUTE HIGHLIGHTER
+        // ==========================================
+        document.getElementById('btnRoute').addEventListener('click', function() {
+            fetch('../data/path_result.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("JSON not found.");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.path && data.path.length > 0) {
+                        highlightDijkstraPath(data.path);
+                    }
+                })
+                .catch(err => {
+                    console.warn(err);
+                    alert("Route JSON not found. Run the C backend Dijkstra first!");
+                });
+        });
+
+        function highlightDijkstraPath(pathArray) {
+            // First, dim everything
+            let pathNodeIds = pathArray.map(name => cityMap[name]).filter(id => id !== undefined);
+            
+            let nodesUpdate = [];
+            nodesData.forEach(node => {
+                if (pathNodeIds.includes(node.id)) {
+                    nodesUpdate.push({ id: node.id, color: { background: '#222', border: '#ff0055' }, font: { color: '#fff' }, borderWidth: 3 });
+                } else {
+                    nodesUpdate.push({ id: node.id, color: { background: '#111', border: '#333' }, font: { color: '#444' }, borderWidth: 1 });
+                }
+            });
+
+            let edgesUpdate = [];
+            edgesData.forEach(edge => {
+                let isPathEdge = false;
+                for (let i = 0; i < pathNodeIds.length - 1; i++) {
+                    if (edge.from === pathNodeIds[i] && edge.to === pathNodeIds[i+1]) {
+                        isPathEdge = true;
+                        break;
+                    }
+                }
+
+                if (isPathEdge) {
+                    edgesUpdate.push({ id: edge.id, color: { color: '#ff0055' }, font: { color: '#ff0055' }, width: 3 });
+                } else {
+                    edgesUpdate.push({ id: edge.id, color: { color: '#222' }, font: { color: '#222' }, width: 1 });
+                }
+            });
+
+            nodesData.update(nodesUpdate);
+            edgesData.update(edgesUpdate);
+        }
+
+        // ==========================================
+        // NETWORK DRAWING & PHYSICS
+        // ==========================================
+        function drawNetwork(fileContent) {
+            const lines = fileContent.split('\n');
+            let readingRoutes = false;
+            let nodesArray = [], edgesArray = [], currentId = 0, edgeId = 0;
+            cityMap = {}; 
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.length === 0 || line.startsWith('#')) return;
+
+                if (line === '---') { readingRoutes = true; return; }
+
+                if (!readingRoutes) {
+                    nodesArray.push({ 
+                        id: currentId, label: line, shape: 'dot', size: 18, 
+                        color: { background: '#222', border: '#00ff88' },
+                        font: { color: '#ccc', size: 14, face: 'monospace' },
+                        borderWidth: 2, fixed: false 
+                    });
+                    cityMap[line] = currentId++;
+                } else {
+                    const parts = line.split(',');
+                    if (parts.length === 3) {
+                        const originId = cityMap[parts[0].trim()];
+                        const destId = cityMap[parts[1].trim()];
+                        if (originId !== undefined && destId !== undefined) {
+                            edgesArray.push({
+                                id: edgeId++, 
+                                from: originId, to: destId, label: parts[2].trim(), arrows: 'to',
+                                color: { color: '#444' },
+                                font: { color: '#888', size: 12, face: 'monospace', align: 'horizontal', background: '#1a1a1a' },
+                                smooth: { type: 'curvedCW', roundness: 0.2 }, width: 1
+                            });
+                        }
+                    }
+                }
+            });
+
+            const container = document.getElementById('network-canvas');
+            nodesData = new vis.DataSet(nodesArray);
+            edgesData = new vis.DataSet(edgesArray);
+            const data = { nodes: nodesData, edges: edgesData };
+            
+            const options = {
+                physics: { barnesHut: { gravitationalConstant: -30000, centralGravity: 0.1, springLength: 200 } },
+                interaction: { hover: true, tooltipDelay: 200, selectConnectedEdges: false }
+            };
+
+            if (network !== null) { network.destroy(); }
+            network = new vis.Network(container, data, options);
+
+            network.once("stabilizationIterationsDone", function () {
+                network.setOptions({ physics: { enabled: false } });
+                
+                const nodeIds = nodesData.getIds();
+                const positions = network.getPositions(nodeIds);
+                
+                nodeIds.forEach(id => {
+                    let x = positions[id].x;
+                    let y = positions[id].y;
+                    let radius = Math.sqrt(x * x + y * y);
+                    let angle = Math.atan2(y, x);
+                    polarCoords[id] = { r: radius, theta: angle };
+                });
+
+                startRotationLoop();
+            });
+
+            // INTERCEPTA O DRAG (Mágica da Órbita)
+            network.on("dragEnd", function (params) {
+                if (params.nodes.length > 0) {
+                    const positions = network.getPositions(params.nodes);
+                    params.nodes.forEach(id => {
+                        let x = positions[id].x;
+                        let y = positions[id].y;
+                        let newRadius = Math.sqrt(x * x + y * y);
+                        let currentAngle = Math.atan2(y, x);
+                        
+                        // Atualiza a coordenada polar subtraindo o giro atual
+                        polarCoords[id] = { 
+                            r: newRadius, 
+                            theta: currentAngle - globalAngleOffset 
+                        };
+                    });
+                }
+            });
+
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    const selectedNodeId = params.nodes[0];
+                    let connectedNodesOut = [], connectedNodesIn = [], outgoingEdges = [], incomingEdges = [];
+                    
+                    edgesData.forEach(edge => {
+                        if (edge.from === selectedNodeId) {
+                            connectedNodesOut.push(edge.to);
+                            outgoingEdges.push(edge.id);
+                        } else if (edge.to === selectedNodeId) {
+                            connectedNodesIn.push(edge.from);
+                            incomingEdges.push(edge.id);
+                        }
+                    });
+
+                    let nodesUpdate = [];
+                    nodesData.forEach(node => {
+                        if (node.id === selectedNodeId) {
+                            nodesUpdate.push({ id: node.id, color: { background: '#222', border: '#fff' }, font: { color: '#fff' }, borderWidth: 2 });
+                        } else if (connectedNodesOut.includes(node.id)) {
+                            nodesUpdate.push({ id: node.id, color: { background: '#222', border: '#00ff88' }, font: { color: '#fff' }, borderWidth: 2 });
+                        } else if (connectedNodesIn.includes(node.id)) {
+                            nodesUpdate.push({ id: node.id, color: { background: '#222', border: '#ff9800' }, font: { color: '#fff' }, borderWidth: 2 });
+                        } else {
+                            nodesUpdate.push({ id: node.id, color: { background: '#111', border: '#333' }, font: { color: '#444' }, borderWidth: 1 });
+                        }
+                    });
+
+                    let edgesUpdate = [];
+                    edgesData.forEach(edge => {
+                        if (outgoingEdges.includes(edge.id)) {
+                            edgesUpdate.push({ id: edge.id, color: { color: '#00ff88' }, font: { color: '#00ff88' }, width: 2 }); 
+                        } else if (incomingEdges.includes(edge.id)) {
+                            edgesUpdate.push({ id: edge.id, color: { color: '#ff9800' }, font: { color: '#ff9800' }, width: 2 }); 
+                        } else {
+                            edgesUpdate.push({ id: edge.id, color: { color: '#222' }, font: { color: '#222' }, width: 1 }); 
+                        }
+                    });
+
+                    nodesData.update(nodesUpdate);
+                    edgesData.update(edgesUpdate);
+                } else {
+                    resetColors();
+                }
+            });
+        }
+
+        function resetColors() {
+            let nodesUpdate = [];
+            nodesData.forEach(node => {
+                nodesUpdate.push({ id: node.id, color: { background: '#222', border: '#00ff88' }, font: { color: '#ccc' }, borderWidth: 2 });
+            });
+            let edgesUpdate = [];
+            edgesData.forEach(edge => {
+                edgesUpdate.push({ id: edge.id, color: { color: '#444' }, font: { color: '#888' }, width: 1 });
+            });
+            nodesData.update(nodesUpdate);
+            edgesData.update(edgesUpdate);
+        }
+
+        function startRotationLoop() {
+            if (animationId) cancelAnimationFrame(animationId);
+            
+            globalAngleOffset = 0;
+
+            function rotate() {
+                let manualRotation = keysPressed.q || keysPressed.e;
+
+                if (isRotating || manualRotation) {
+                    if (keysPressed.q) {
+                        globalAngleOffset -= manualRotationSpeed;
+                    } else if (keysPressed.e) {
+                        globalAngleOffset += manualRotationSpeed;
+                    } else if (isRotating) {
+                        globalAngleOffset += rotationSpeed;
+                    }
+                    
+                    const nodeIds = nodesData.getIds();
+                    let updates = [];
+                    
+                    nodeIds.forEach(id => {
+                        let polar = polarCoords[id];
+                        if (polar) {
+                            let currentAngle = polar.theta + globalAngleOffset;
+                            let newX = polar.r * Math.cos(currentAngle);
+                            let newY = polar.r * Math.sin(currentAngle);
+                            updates.push({ id: id, x: newX, y: newY });
+                        }
+                    });
+                    
+                    nodesData.update(updates);
+                }
+                animationId = requestAnimationFrame(rotate);
+            }
+            rotate();
+        }
+    </script>
+</body>
+</html>
