@@ -42,7 +42,6 @@ make
 ```bash
 ./build/logistics
 ```
-*(Use the terminal menu to load the map and calculate a route via Dijkstra to generate the JSON payload).*
 
 **3. Launch the Live Radar (Frontend):**
 To avoid CORS blockages when reading local files, start a simple local server from the root directory:
@@ -59,6 +58,17 @@ To use this feature, make sure the configuration file (`map.txt`) is located ins
 
 **Required .txt format:**
 The file functions as a custom `.csv`. The first section lists the cities, and after the separator `---`, the routes are defined in the format `Origin, Destination, Cost`.
+
+## 🛣️ How to Visualize the Dijkstra Route (Step-by-Step)
+
+The Web Radar is strictly bound to the `map.txt` state. To see the routing integration working seamlessly, follow these steps:
+
+1. **Start the Backend:** Run `./build/logistics` in your terminal.
+2. **Load the Grid:** Select the terminal option to load data from `map.txt`. *(Note: Nodes added manually via the console menu will not render on the Web Radar).*
+3. **Calculate the Route:** Choose the Dijkstra option and input your Origin and Destination.
+4. **Generate Payload:** Wait for the terminal to display `[Sistema] Rota exportada para o Radar com sucesso`.
+5. **Open the Radar:** Ensure your python server is running and open the frontend in your browser.
+6. **See the Magic:** Click the **"Show Dijkstra Route"** button on the web dashboard to see the exact shortest path highlighted in neon pink/red.
 
 ## 📈 Project Status
 
