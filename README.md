@@ -66,7 +66,7 @@ The Web Radar is strictly bound to the `map.txt` state. To see the routing integ
 1. **Start the Backend:** Run `./build/logistics` in your terminal.
 2. **Load the Grid:** Select the terminal option to load data from `map.txt`. *(Note: Nodes added manually via the console menu will not render on the Web Radar).*
 3. **Calculate the Route:** Choose the Dijkstra option and input your Origin and Destination.
-4. **Generate Payload:** Wait for the terminal to display `[Sistema] Rota exportada para o Radar com sucesso`.
+4. **Generate Payload:** Wait for the terminal.
 5. **Open the Radar:** Ensure your python server is running and open the frontend in your browser.
 6. **See the Magic:** Click the **"Show Dijkstra Route"** button on the web dashboard to see the exact shortest path highlighted in neon pink/red.
 
