@@ -5,13 +5,13 @@
 
 typedef struct Edge{
   int next_vertex_id;
-  int weight;
+  int weight; // Cost of the route
   struct Edge* next;
 }Edge;
 
 typedef struct Vertex{
-  int vertex_id;
-  int x_position;
+  int vertex_id
+  int x_position; // Used to UI/Visual mapping
   int y_position;
   char* name;
   Edge* edges;

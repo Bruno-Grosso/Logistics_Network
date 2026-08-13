@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "priority_queue.h"
 
+// Allocates the heap structure and its internal array
 MinHeap* create_min_heap(int num_vertex){
 
   MinHeap* heap = (MinHeap*)malloc(sizeof(MinHeap));
@@ -13,12 +14,14 @@ MinHeap* create_min_heap(int num_vertex){
   return heap;
 }
 
+// Internal helper to swap two nodes
 void swap(HeapNode* a, HeapNode* b){
   HeapNode temp = *a;
   *a = *b;
   *b = temp;
 }
 
+// Restores the min-heap property bottom-up
 void heapfy_up(MinHeap* heap, int current_index){
   
   if(current_index == 0){
@@ -34,6 +37,7 @@ void heapfy_up(MinHeap* heap, int current_index){
   }
 }
 
+// Inserts a new node and heapifies up
 void insert_min_heap(MinHeap* heap, int vertex_id, int cost){
 
   if(heap->size == heap->capacity){
@@ -51,6 +55,7 @@ void insert_min_heap(MinHeap* heap, int vertex_id, int cost){
 
 }
 
+// Restores the min-heap property top-down
 void heapfy_down(MinHeap* heap, int current_index){
 
   int left_child = (2 * current_index) + 1;
@@ -74,6 +79,7 @@ void heapfy_down(MinHeap* heap, int current_index){
   }
 }
 
+// Removes and returns the node with the minimum cost
 HeapNode extract_min(MinHeap* heap){
 
   if(heap->size == 0){

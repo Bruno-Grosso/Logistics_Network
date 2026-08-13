@@ -4,7 +4,7 @@
 typedef struct TrafficNode{
   int vertex_id;
   char* name;
-  int incoming_routes;
+  int incoming_routes; // Key metric for auditing/Rselect
 }TrafficNode;
 
 void merge_sort(TrafficNode* ranking, int left, int right);

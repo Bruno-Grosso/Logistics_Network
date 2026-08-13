@@ -6,6 +6,7 @@
 #include "graph.h"
 #include "hash_table.h"
 
+// Reads file sequentially, using hash lookups to build the graph
 void load_map(Graph* map, HashTable* hash, const char* filename){
   
   FILE* file = fopen(filename, "r");
@@ -20,7 +21,8 @@ void load_map(Graph* map, HashTable* hash, const char* filename){
   int current_id = 0;
 
   while (fgets(line, sizeof(line), file)){
-
+    
+    // Strip newline character
     line[strcspn(line, "\n")] = 0;
 
     if (strlen(line) == 0 || line[0] == '#'){
@@ -42,7 +44,8 @@ void load_map(Graph* map, HashTable* hash, const char* filename){
       char origin[100];
       char destination[100];
       int traffic;
-
+      
+      // Parses CSV-like format: Origin, Destination, Weight
       if (sscanf(line, "%[^,], %[^,], %d", origin, destination, &traffic) == 3){
         int o_id = search_hash(hash, origin);
         int d_id = search_hash(hash, destination);

@@ -3,7 +3,7 @@
 
 typedef struct HeapNode{
   int vertex_id;
-  int cost;
+  int cost; // Priority value for Dijkstra extraction
 }HeapNode;
 
 typedef struct MinHeap{

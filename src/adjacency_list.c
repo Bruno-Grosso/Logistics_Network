@@ -5,6 +5,7 @@
 #include "graph.h"
 #include "merge_sort.h"
 
+// Allocates graph and initializes vertex array
 Graph* create_graph(int num_vertex){
   
   Graph* map = (Graph*)malloc(sizeof(Graph));
@@ -19,6 +20,7 @@ Graph* create_graph(int num_vertex){
   return map;
 }
 
+// Allocates the vertex city
 Graph* create_vertex(Graph* map, int id, int x_position, int y_position, char name[]){
 
   Vertex* new_vertex = (Vertex*)malloc(sizeof(Vertex));
@@ -35,6 +37,7 @@ Graph* create_vertex(Graph* map, int id, int x_position, int y_position, char na
   return map;
 }
 
+// Internal helper for edge allocation
 Edge* create_edge(int destination, int weight){
 
   Edge* new_edge = (Edge*)malloc(sizeof(Edge));
@@ -46,6 +49,7 @@ Edge* create_edge(int destination, int weight){
   return new_edge;
 }
 
+// Inserts at the head of the adjacency list
 Graph* add_edge(Graph* map, int weight, int origin, int destination){
   
   Edge* new_edge = create_edge(destination, weight);
@@ -58,6 +62,7 @@ Graph* add_edge(Graph* map, int weight, int origin, int destination){
   return map;
 }
 
+// Traverses entire graph to compute in-degrees for auditing
 TrafficNode* generate_traffic_array(Graph* map){
   if(map == NULL) return NULL;
 

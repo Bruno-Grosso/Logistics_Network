@@ -3,6 +3,7 @@
 
 #include "merge_sort.h"
 
+// Internal helper function: Sorts in descending order based on `incoming_routes`.
 void merge(TrafficNode traffic_array[], int left, int mid, int right){
   int left_size = mid-left+1;
   int right_size = right-mid;
@@ -52,6 +53,7 @@ void merge(TrafficNode traffic_array[], int left, int mid, int right){
 
 }
 
+// Recursive divide and conquer
 void merge_sort(TrafficNode traffic_array[], int left, int right){
 
   if(left<right){

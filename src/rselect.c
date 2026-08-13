@@ -4,12 +4,14 @@
 
 #include "rselect.h"
 
+// Internal helper: swap for TrafficNodes
 static void swap(TrafficNode* a, TrafficNode* b){
   TrafficNode temp = *a;
   *a = *b;
   *b = temp;
 }
 
+// Internal helper: randomized partition
 static int partition(TrafficNode arr[], int low, int high){
 
   int random_index = low + rand() % (high - low + 1);
@@ -32,6 +34,7 @@ static int partition(TrafficNode arr[], int low, int high){
   return i-1;
 }
 
+// Recursive Randomized Select
 TrafficNode rselect(TrafficNode arr[], int low, int high, int k){
 
   if(low == high){
@@ -51,6 +54,7 @@ TrafficNode rselect(TrafficNode arr[], int low, int high, int k){
   }
 }
 
+// Audits network by finding the median and listing underperforming zones
 void run_logistics_audit(TrafficNode arr[], int num_vertex) {
   if (num_vertex == 0) return;
 

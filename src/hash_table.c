@@ -2,6 +2,7 @@
 #include<string.h>
 #include "hash_table.h"
 
+// Allocates and initializes the hash table array
 HashTable* create_hash(int table_size){
 
   HashTable* hash = (HashTable*)malloc(sizeof(HashTable));
@@ -16,6 +17,7 @@ HashTable* create_hash(int table_size){
   return hash;
 }
 
+// djb2 hash algorithm
 static int hash_function(char* str, int table_size){
   
   unsigned long hash_code = 5381;
@@ -28,6 +30,7 @@ static int hash_function(char* str, int table_size){
   return hash_code%table_size;
 }
 
+// Internal helper to allocate a new hash node
 HashNode* create_node(char* str, int vertex_id){
 
   HashNode* new_node = (HashNode*)malloc(sizeof(HashNode));
@@ -41,6 +44,8 @@ HashNode* create_node(char* str, int vertex_id){
   return new_node;
 }
 
+
+// Resolves collisions using linked list at the head
 HashTable* insert_hash(HashTable* hash, char* str, int vertex_id){
 
   int hash_code = hash_function(str, hash->size);

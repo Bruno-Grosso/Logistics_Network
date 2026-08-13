@@ -7,6 +7,7 @@
 
 #define INF 99999
 
+// Calculates shortest path using Min-Heap and exports JSON payload
 void shortest_path(Graph* map, int start_vertex, int end_vertex){
 
   int num_vertex = map->num_vertex;

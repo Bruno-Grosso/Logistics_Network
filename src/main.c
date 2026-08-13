@@ -26,6 +26,7 @@ int main(){
   printf("How many vertex you need? ");
   scanf("%d", &num_vertex);
 
+  // System core structures initialization
   Graph* map = create_graph(num_vertex);
 
   int table_size = 4099;
@@ -61,6 +62,7 @@ int main(){
   int origin_id, destination_id, weight;
   char origin[50], destination[50];
 
+  // Main engine execution loop
   while (continua != 6) {
   
     printf("\n--- LOGISTICS NETWORK MENU ---\n");
@@ -81,6 +83,7 @@ int main(){
         printf("Which is the destination city? ");
         scanf(" %[^\n]", destination);
 
+        // Hash lookup to map string inputs to internal IDs
         origin_id = search_hash(hash, origin);
         destination_id = search_hash(hash, destination);
 
@@ -172,6 +175,7 @@ int main(){
 
   }
   
+  // Free all dynamically allocated memory before exiting
   free_graph(map);
   free_hash(hash);
   return 0;
