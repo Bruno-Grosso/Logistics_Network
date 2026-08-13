@@ -10,7 +10,7 @@ typedef struct Edge{
 }Edge;
 
 typedef struct Vertex{
-  int vertex_id
+  int vertex_id;
   int x_position; // Used to UI/Visual mapping
   int y_position;
   char* name;
